@@ -24,10 +24,9 @@ import net.millan_mvvm.navigation.ROUTE_SIGNUP
 import net.millan_mvvm.R
 import net.millan_mvvm.ui.theme.spacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController) {
-    var email by remember { mutableStateOf("") }
+    var usernameFilterGMail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     ConstraintLayout(
@@ -52,9 +51,9 @@ fun LoginScreen(navController: NavController) {
 
 
         TextField(
-            value = email,
+            value = usernameFilterGMail,
             onValueChange = {
-                email = it
+                usernameFilterGMail = it
             },
             label = {
                 Text(text = stringResource(id = R.string.email))

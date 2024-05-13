@@ -41,12 +41,5 @@ data class Course (
     val duration: String,
     val rating: Float,
     val students: Int,
-    val lessons: List<Lesson>
 )
 
-data class Lesson (
-    val id: Int,
-    val title: String,
-    val duration: String,
-    val isCompleted: Boolean
-)

@@ -1,0 +1,195 @@
+@Composable
+fun SearchSection() {
+    var search by remember { mutableStateOf(TextFieldValue("")) }
+    OutlinedTextField(
+        value = search,
+        onValueChange = { search = it },
+        placeholder = { Text("Search...") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    )
+}
+
+@Composable
+fun CategorySection(navController: NavHostController) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text("Categories", fontWeight = FontWeight.Bold)
+        }
+        Column(
+
+        ) {
+            Text("View all",
+            modifier = Modifier.clickable{navController.navigate(ROUTE_COURSES){
+                popUpTo(ROUTE_HOME) {inclusive = true}
+            } }
+            )
+        }
+    }
+}
+
+@Composable
+fun CoursesSection(navController: NavHostController) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween){
+        CourseCard("Data Science", Color(0xffF9D5CE), navController)
+        Spacer(modifier = Modifier.width(25.dp))
+        CourseCard("Cyber Security", Color(0xffF9F6CE), navController)
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween){
+        CourseCard("PhP", Color(0xffd1f9f4), navController)
+        Spacer(modifier = Modifier.width(25.dp))
+        CourseCard("MIT", Color(0xffd1e5f9), navController)
+    }
+}
+
+@Composable
+fun CourseCard(title: String, color: Color, navController: NavHostController) {
+    Card(
+        modifier = Modifier
+            .height(100.dp)
+            .width(180.dp)
+            .clickable {
+                navController.navigate(ROUTE_COURSES) {
+                    popUpTo(ROUTE_HOME) { inclusive = true }
+                }
+            },
+        colors = CardDefaults.cardColors(color)
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier.padding(20.dp)
+        )
+    }
+}
+
+@Composable
+fun RecommendationsSection(navController: NavHostController) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Recommended", fontWeight = FontWeight.Bold)
+            Text("View all",
+                modifier = Modifier
+                    .clickable{ navController.navigate(ROUTE_COURSES) {
+                        popUpTo(ROUTE_HOME) { inclusive = true }}
+
+            })
+        }
+
+
+
+        Spacer(modifier = Modifier
+            .height(20.dp)
+        )
+
+        Row {
+            Card (modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp),
+                colors = CardDefaults.cardColors(Color(0xffF9D5CE))
+            ){
+                Text(text = "Introduction to Python",
+                    modifier = Modifier
+                        .padding(top = 60.dp, start = 70.dp),
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center
+
+
+                )
+
+
+
+
+
+            }
+
+
+        }
+
+        Row { Text(text = "Courses Screen",
+            modifier = Modifier
+                .clickable{ navController.navigate(ROUTE_COURSES) {
+                    popUpTo(ROUTE_HOME) { inclusive = true }}}
+        ) }
+    }
+}
+
+@Composable
+fun BottomBar(
+    selectedItemIndex: Int,
+    onItemSelected: (Int) -> Unit
+) {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier
+//            .hoverable( "")
+
+    ) {
+        val items = listOf(
+            NavigationItem(Icons.Default.Home, "Home"),
+            NavigationItem(Icons.Default.PlayArrow, "Courses"),
+            NavigationItem(Icons.Default.Favorite, "Favourites"),
+            NavigationItem(Icons.Default.Person, "Profile")
+        )
+
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
+                label = { Text(text = item.label) },
+                selected = (selectedItemIndex == index),
+                onClick = {
+                    onItemSelected(index)
+                    //navigate to page
+
+                }
+            )
+        }
+    }
+}
+
+data class NavigationItem(val icon: ImageVector, val label: String)
+
+
+        bottomBar = {
+            BottomBar(
+                selectedItemIndex = selectedIndex,
+                onItemSelected = { index ->
+                    selectedIndex = index
+                    // Handle navigation based on the selected index
+                    when (index) {
+                        0 -> navController.navigate(ROUTE_HOME) // Navigate to Home
+                        1 -> navController.navigate(ROUTE_COURSES) // Navigate to Courses
+                        2 -> navController.navigate("profile") // Navigate to Profile
+                        3 -> navController.navigate("favorites") // Navigate to Favorites
+                    }
+                }
+            )
+        }
+
+
+                    Spacer(modifier = Modifier
+                        .width(90.dp)
+                    )
+                    AsyncImage(
+                        model = "https://i.pinimg.com/originals/86/68/64/866864e81fdf004999e673ce333eeadb.png",
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(60.dp)
+
+                    )

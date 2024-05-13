@@ -1,210 +1,173 @@
+// HomeScreen.kt
 package net.millan_mvvm.ui.screen.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.R
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
-import net.millan_mvvm.navigation.ROUTE_COURSES
-import net.millan_mvvm.navigation.ROUTE_HOME
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import net.millan_mvvm.data.courses.Course
+import net.millan_mvvm.ui.theme.Blue200
+
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
-    var selectedIndex by remember { mutableStateOf(0) }
+fun HomeScreen() {
+    val homeViewModel = HomeViewModel()
+    // fetch popular courses
+    LaunchedEffect(key1 = Unit) {
+        print("Fetching popular courses")
+        homeViewModel.fetchPopularCourses()
+    }
 
-    Scaffold(
-        bottomBar = {
-            BottomBar(
-                selectedItemIndex = selectedIndex,
-                onItemSelected = { index ->
-                    selectedIndex = index
-                    // Handle navigation based on the selected index
-                    when (index) {
-                        0 -> navController.navigate("home") // Navigate to Home
-                        1 -> navController.navigate("courses") // Navigate to Courses
-                        2 -> navController.navigate("profile") // Navigate to Profile
-                        3 -> navController.navigate("favorites") // Navigate to Favorites
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            contentPadding = paddingValues,
-            modifier = Modifier.fillMaxSize()
-                .padding(10.dp)
+    // Collect popularCourses StateFlow and display UI
+    val popularCourses by homeViewModel.popularCourses.collectAsState()
+
+
+
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding)
         ) {
-            item {
-                GreetingSection(navController)
-                SearchSection()
-                CategorySection(navController)
-                CoursesSection(navController)
-                RecommendationsSection(navController)
-            }
+            SearchField()
+            PopularCourses(courses = popularCourses)
         }
     }
 }
-
 @Composable
-fun GreetingSection(navController: NavHostController) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navController.navigate(ROUTE_COURSES) {
-                    popUpTo(ROUTE_HOME) { inclusive = true }
-                }
-            }
-            .padding(10.dp)
-    ) {
-        Row {
-            Column {
-                Text(
-                    text = "Hi, Milan!",
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = "What do you want to learn today?",
-                    fontWeight = FontWeight.Thin
-                )
-            }
-            AsyncImage(
-                model = "https://i.pinimg.com/originals/86/68/64/866864e81fdf004999e673ce333eeadb.png",
-                contentDescription = "Profile Picture"
-            )
-        }
-    }
-}
+fun SearchField() {
+    var text by remember { mutableStateOf(TextFieldValue()) }
 
-@Composable
-fun SearchSection() {
-    var search by remember { mutableStateOf(TextFieldValue("")) }
+    val textFieldColors = TextFieldDefaults.colors(
+        cursorColor = Color.Black,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent
+    )
+
     OutlinedTextField(
-        value = search,
-        onValueChange = { search = it },
-        placeholder = { Text("Search...") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
+        value = text,
+        onValueChange = { text = it },
+        label = { Text("Search") },
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = 12.dp),
+        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+        colors = textFieldColors,
+        shape = RoundedCornerShape(16.dp),
+        leadingIcon = {
+            Icon(Icons.Filled.Search, contentDescription = "Search")
+        },
+        trailingIcon = {
+            Icon(Icons.Filled.Settings, contentDescription = "Favorites", modifier = Modifier.clickable { /*TODO*/ })
+        }
     )
 }
 
 @Composable
-fun CategorySection(navController: NavHostController) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
-            Text("Categories", fontWeight = FontWeight.Bold)
-        }
-        Column(
-            modifier = Modifier.clickable {
-                navController.navigate(ROUTE_COURSES) {
-                    popUpTo(ROUTE_HOME) { inclusive = true }
-                }
-            }
-        ) {
-            Text("View all")
+fun PopularCourses(courses: List<Course>) {
+    LazyRow {
+        items(courses.size) { course ->
+            CourseItem(course = courses[course])
         }
     }
 }
 
 @Composable
-fun CoursesSection(navController: NavHostController) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        CourseCard("Data Science", Color(0xffd1f9f4), navController)
-        Spacer(modifier = Modifier.width(25.dp))
-        CourseCard("Cyber Security", Color(0xffd1e5f9), navController)
-    }
-}
-
-@Composable
-fun CourseCard(title: String, color: Color, navController: NavHostController) {
-    Card(
-        modifier = Modifier
-            .height(70.dp)
-            .width(150.dp)
-            .clickable {
-                navController.navigate(ROUTE_COURSES) {
-                    popUpTo(ROUTE_HOME) { inclusive = true }
-                }
-            },
-        colors = CardDefaults.cardColors(color)
-    ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(20.dp)
-        )
-    }
-}
-
-@Composable
-fun RecommendationsSection(navController: NavHostController) {
+fun CourseItem(course: Course) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
     ) {
+        // Display image
+        CourseImage(
+            imageUrl = course.thumbnail
+        )
+
+        // Display title
+        Text(
+            text = course.title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // Display instructor
+        Text(
+            text = course.instructor,
+            fontSize = 12.sp,
+            color = Blue200,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        // Display stars based on rating
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Recommended", fontWeight = FontWeight.Bold)
-            Text("View all")
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        CourseCard("Introduction to PHP", Color(0xffbfa2f4), navController)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                repeat(5) { index ->
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Star",
+                        tint = if (index < course.rating.toInt()) Color(0xFFFFD700) else Color.Gray,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                }
+                Spacer(modifier = Modifier.width(1.dp))
+                Text(
+                    text = "(${course.rating})",
+                    fontSize = 8.sp,
+                    color = Color.Gray
+                )
+            }
+        }/**/
     }
 }
 
 @Composable
-fun BottomBar(
-    selectedItemIndex: Int,
-    onItemSelected: (Int) -> Unit
-) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        val items = listOf(
-            NavigationItem(Icons.Default.Home, "Home"),
-            NavigationItem(Icons.Default.Favorite, "Courses"),
-            NavigationItem(Icons.Default.Person, "Profile"),
-            NavigationItem(Icons.Default.Favorite, "Favorites")
-        )
+fun CourseImage(imageUrl: String) {
+    val painter: Painter = // You can add options here if needed
+        rememberAsyncImagePainter(ImageRequest.Builder(LocalContext.current).data(data = imageUrl).apply(block = fun ImageRequest.Builder.() {
+            // You can add options here if needed
+        }).build())
 
-        items.forEachIndexed { index, item ->
-            NavigationBarItem(
-                icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
-                label = { Text(text = item.label) },
-                selected = (selectedItemIndex == index),
-                onClick = {
-                    onItemSelected(index)
-                }
-            )
-        }
-    }
+    Image(
+        painter = painter,
+        contentDescription = null,
+        modifier = Modifier
+            .size(120.dp)
+            .padding(4.dp),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.Center,
+    )
 }
 
-data class NavigationItem(val icon: ImageVector, val label: String)
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    HomeScreen(rememberNavController())
+    HomeScreen()
 }
