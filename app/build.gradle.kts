@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "net.millan_mvvm"
+        applicationId = "milan.millan_mvvm"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
@@ -81,9 +81,10 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.ai.client.generativeai:generativeai:0.4.0")
+    implementation("com.google.ai.client.generativeai:generativeai:0.5.0")
     implementation("com.google.firebase:firebase-vertexai:16.0.0-alpha03")
     implementation("androidx.wear.compose:compose-material:1.3.1")
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -7,9 +7,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import net.ezra.ui.login.LoginScreen
+import net.ezra.ui.signup.SignUpScreen
 import net.millan_mvvm.ui.SplashScreen
-import net.millan_mvvm.ui.screen.auth.LoginScreen
-import net.millan_mvvm.ui.screen.auth.SignupScreen
+import net.millan_mvvm.ui.components.Les.LessonScreen
+import net.millan_mvvm.ui.screen.Course.CourseView
+import net.millan_mvvm.ui.screen.Profile.ProfileScreen
+
 import net.millan_mvvm.ui.screen.courses.ContactScreen
 
 import net.millan_mvvm.ui.screen.home.HomeScreen
@@ -20,6 +24,7 @@ import net.millan_mvvm.ui.screen.home.HomeViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    homeViewModel: HomeViewModel = HomeViewModel(),
     startDestination: String = ROUTE_SPLASH
 
 
@@ -27,7 +32,7 @@ fun AppNavHost(
     BackHandler {
         navController.popBackStack()
 
-        }
+    }
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -36,24 +41,29 @@ fun AppNavHost(
 
 
         composable(ROUTE_LOGIN) {
-            LoginScreen(navController)
+            LoginScreen(navController = navController)
         }
 
 
         composable(ROUTE_SIGNUP) {
-            SignupScreen(navController)
+            SignUpScreen(navController = navController)
         }
 
 
         composable(ROUTE_HOME) {
-            HomeScreen()
+            HomeScreen(
+                navController,
+                homeViewModel
+            )
         }
-
-
 
 
         composable(ROUTE_COURSES) {
             ContactScreen(navController)
+        }
+
+        composable(ROUTE_COURSE) {
+            CourseView(navController)
         }
 
 
@@ -62,9 +72,13 @@ fun AppNavHost(
             SplashScreen(navController)
         }
 
+        composable(ROUTE_PROFILE) {
+            ProfileScreen(navController)
+        }
 
-
-
+        composable(ROUTE_LESSON) {
+            LessonScreen(navController)
+        }
 
 
 

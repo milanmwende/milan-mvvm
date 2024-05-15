@@ -16,6 +16,9 @@ class HomeViewModel : ViewModel() {
     // Expose popularCourses as StateFlow instead of a simple List
     val popularCourses: StateFlow<List<Course>> = _popularCourses
 
+    // navigate to course details
+
+
     fun fetchPopularCourses() {
         viewModelScope.launch {
             try {

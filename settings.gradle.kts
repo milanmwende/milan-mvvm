@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "millan-mvvm"
+rootProject.name = "mmillan-mvvm"
 include(":app")
  

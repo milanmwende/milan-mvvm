@@ -1,162 +1,220 @@
-package net.millan_mvvm.ui.screen.auth
+package net.ezra.ui.signup
 
-import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration
+import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
+
 import net.millan_mvvm.R
+import net.millan_mvvm.navigation.ROUTE_HOME
 import net.millan_mvvm.navigation.ROUTE_LOGIN
 import net.millan_mvvm.navigation.ROUTE_SIGNUP
-import net.millan_mvvm.ui.theme.spacing
+import net.millan_mvvm.ui.components.course.NavItem
+import net.millan_mvvm.ui.screen.auth.AuthHeader
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignupScreen(navController: NavHostController) {
-    var name by remember { mutableStateOf("") }
+fun SignUpScreen(navController: NavController) {
+//    Column {
+//        Box (
+//            Modifier.fillMaxSize()
+//        ) {
+//
+//            Image(painter = painterResource(id = R.drawable.cblogo), contentDescription = "",
+//                contentScale = ContentScale.FillBounds,
+//                modifier = Modifier
+//                    .fillMaxSize())
+//
+//        }
+//
+//    }
+
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    ConstraintLayout(
-        modifier = Modifier.fillMaxSize()
+
+
+    Column(
+        modifier = Modifier
+            .background(color = Color.White)
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        val (refHeader, refName, refEmail, refPassword, refButtonSignup, refTextSignup) = createRefs()
-        val spacing = MaterialTheme.spacing
+AuthHeader()
 
-        Box(
-            modifier = Modifier
-                .constrainAs(refHeader) {
-                    top.linkTo(parent.top, spacing.extraLarge)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }
-                .wrapContentSize()
-        ) {
-            AuthHeader()
-        }
 
-        TextField(
-            value = name,
-            onValueChange = {
-                name = it
-            },
-            label = {
-                Text(text = stringResource(id = R.string.name))
-            },
-            modifier = Modifier.constrainAs(refName) {
-                top.linkTo(refHeader.bottom, spacing.extraLarge)
-                start.linkTo(parent.start, spacing.large)
-                end.linkTo(parent.end, spacing.large)
-                width = Dimension.fillToConstraints
-            },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            )
-        )
+        Text("Sign Up", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
+        OutlinedTextField(
             value = email,
-            onValueChange = {
-                email = it
-            },
-            label = {
-                Text(text = stringResource(id = R.string.email))
-            },
-            modifier = Modifier.constrainAs(refEmail) {
-                top.linkTo(refName.bottom, spacing.medium)
-                start.linkTo(parent.start, spacing.large)
-                end.linkTo(parent.end, spacing.large)
-                width = Dimension.fillToConstraints
-            },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            )
+            onValueChange = { email = it },
+            label = { Text("Email", color = Color.Black) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(Color.Black)
         )
+        Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
+
+        OutlinedTextField(
             value = password,
-            onValueChange = {
-                password = it
-            },
-            label = {
-                Text(text = stringResource(id = R.string.password))
-            },
-            modifier = Modifier.constrainAs(refPassword) {
-                top.linkTo(refEmail.bottom, spacing.medium)
-                start.linkTo(parent.start, spacing.large)
-                end.linkTo(parent.end, spacing.large)
-                width = Dimension.fillToConstraints
-            },
+            onValueChange = { password = it },
+            label = { Text("Password", color = Color.Black) },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            )
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(Color.Black)
         )
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password", color = Color.Black) },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(Color.Black)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-            },
-            modifier = Modifier.constrainAs(refButtonSignup) {
-                top.linkTo(refPassword.bottom, spacing.large)
-                start.linkTo(parent.start, spacing.extraLarge)
-                end.linkTo(parent.end, spacing.extraLarge)
-                width = Dimension.fillToConstraints
-            }
-        ) {
-            Text(text = stringResource(id = R.string.signup), style = MaterialTheme.typography.titleMedium)
-        }
-
-
-        Text(
-            modifier = Modifier
-                .constrainAs(refTextSignup) {
-                    top.linkTo(refButtonSignup.bottom, spacing.medium)
-                    start.linkTo(parent.start, spacing.extraLarge)
-                    end.linkTo(parent.end, spacing.extraLarge)
-                }
-                .clickable {
-                    navController.navigate(ROUTE_LOGIN) {
-                        popUpTo(ROUTE_SIGNUP) { inclusive = true }
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(48.dp))
+        } else {
+            Button(
+                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                onClick = {
+                    if (email.isBlank()){
+                        error = "Email is required"
+                    } else if (password.isBlank()){
+                        error = "Password is required"
+                    } else if(confirmPassword.isBlank()) {
+                        error = "Password Confirmation required"
+                    } else if (password != confirmPassword) {
+                        error = "Passwords do not match"
+                    } else {
+                        isLoading = true
+                        signUp(email, password, {
+                            isLoading = false
+                            Toast.makeText(context, "Sign-up successful!", Toast.LENGTH_SHORT).show()
+                            onSignUpSuccess(
+                                navController.navigate(ROUTE_HOME) {
+                                    popUpTo(ROUTE_SIGNUP) { inclusive = true }
+                                }
+                            )
+                        }) { errorMessage ->
+                            isLoading = false
+                            error = errorMessage
+                        }
                     }
                 },
-            text = stringResource(id = R.string.already_have_account),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Sign Up", color = Color.Black)
+            }
 
+
+            Text(
+                modifier = Modifier
+
+                    .clickable {
+                        navController.navigate(ROUTE_LOGIN) {
+                            popUpTo(ROUTE_SIGNUP) { inclusive = true }
+                        }
+                    },
+                text = "Login",
+                textAlign = TextAlign.Center,
+                color = Color.Black
+            )
+
+        }
+
+        error?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
     }
 }
 
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_NO)
-@Composable
-fun SignupScreenPreviewLight() {
-    SignupScreen(rememberNavController())
+fun onSignUpSuccess(navigate: Unit) {
+
 }
+
+
+private fun signUp(email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val signInMethods = task.result?.signInMethods ?: emptyList()
+                if (signInMethods.isNotEmpty()) {
+                    onError("Email is already registered")
+                } else {
+                    // Email is not registered, proceed with sign-up
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { signUpTask ->
+                            if (signUpTask.isSuccessful) {
+                                onSuccess()
+                            } else {
+                                onError(signUpTask.exception?.message ?: "Sign-up failed")
+                            }
+                        }
+                }
+            } else {
+                onError(task.exception?.message ?: "Failed to check email availability")
+            }
+        }
+}
+
+
+
+
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun HomeScreenPreviewLight() {
+    SignUpScreen(rememberNavController())
+}
+
+
 

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "577759783185",
-    "project_id": "milanfinal-f56c9",
-    "storage_bucket": "milanfinal-f56c9.appspot.com"
+    "project_number": "911956096042",
+    "project_id": "millan-mvvm",
+    "storage_bucket": "millan-mvvm.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:577759783185:android:68de1bcada01c3b28944b0",
+        "mobilesdk_app_id": "1:911956096042:android:a99052f6b9c5768fe0bf53",
         "android_client_info": {
-          "package_name": "milan.millan_mvvm"
+          "package_name": "net.millan_mvvm"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCJs8Dj64VYFfyaGVgrOIEWBKTdIAyJlqA"
+          "current_key": "AIzaSyAYIwLnSP9AUD2vneL4YWh_2arWNPchxxo"
         }
       ],
       "services": {
